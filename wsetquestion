@@ -114,7 +114,7 @@ class Question
 end
 
 super_question = Question.new("data.csv")
-@my_nbr=3.0
+@my_nbr=42
 (1..@my_nbr).each do |qnbr|
   super_question.ask_question(rand(super_question.nbr_question_type))
   sleep(1)
