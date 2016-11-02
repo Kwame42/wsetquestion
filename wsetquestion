@@ -1,0 +1,122 @@
+#!/usr/local/bin/ruby -w
+
+class Question
+  @@pays=0;
+  @@sr=Array.new(5)
+  @@srw=Array.new(5)
+  @@ville=Array.new(4)
+  @@nbr_answer=0
+  @@nbr_good_answers=0
+  
+  def initialize (file)
+    @@question_data = IO.readlines(file)
+  end
+
+  def random_line()
+    (\
+      @@sr[0],@@sr[1],@@sr[2],@@sr[3],@@sr[4],\
+      @@ville[0],@@ville[1],@@ville[2],@@ville[3],@@ville[4],\
+      @@srw[0],@@srw[1],@@srw[2],@@srw[3],@@srw[4] \
+    ) = (@@question_data[rand(@@question_data.size)]).split(";")
+  end
+  
+  def question_cepage()
+    @answer=""
+    begin
+      random_line()
+      @nbr_cepage = rand(@@srw.size)
+    end until !@@srw[@nbr_cepage].empty?
+    begin
+      @nbr_sous_region = rand(@@sr.size)
+    end until !@@sr[@nbr_sous_region].empty?
+    print "Can you give the name of a grape variety from " 
+    (0..@nbr_sous_region).each do |subPosition|
+      print @@sr[subPosition] + " "
+      @answer += @@sr[subPosition] + ";"
+    end
+    print ":\n"
+    begin
+      @reponse_cepage = gets.chop
+    end until (!@reponse_cepage.empty?)
+    @reponse_cepage = @reponse_cepage.chop
+    @@question_data.each do |line|
+      @nbr=@@nbr_good_answers
+      line=line.chop
+      if ( line =~ /^#@answer(.*)#{@reponse_cepage}/)
+        @@nbr_good_answers += 1
+        break
+      end
+    end
+    if (@nbr == @@nbr_good_answers)
+      puts "Bad answer... a good one is: " + @@srw[@nbr_cepage]
+    else
+      puts "good job bro !"
+    end
+  end
+  
+  def question_sous_region()
+    @sous_region = ""
+    @nbr=0
+    begin
+      random_line()
+      @nbr=1+rand(@@sr.size-1)
+      @sous_region=@@sr[@nbr]
+    end until (!@sous_region.empty?)
+    @nbr -= 1
+    print "can you give the name of a sub region from "
+    @answer=@sanswer=""
+    (0..@nbr).each do |subPosition|
+      print @@sr[subPosition] + " "
+      @answer += @@sr[subPosition] + ";"
+    end
+    puts
+    begin
+      @sanswer = gets.chop
+    end until (!@sanswer.empty?)
+    @@question_data.each do |line|
+      @nbr=@@nbr_good_answers
+      line=line.chop
+      if ( line =~ /^#@answer(.*)#@sanswer/)
+        @@nbr_good_answers += 1
+        break
+      end
+    end
+    if (@nbr == @@nbr_good_answers)
+      puts "Bad answer... a good one  was : " + @sous_region
+    else
+      puts "good job bro !"
+    end
+  end
+  
+  def question_ville()
+    puts "question ville"
+    puts random_line
+    gets
+  end
+
+  def nbr_question_type()
+    return(2)
+  end
+  
+  def ask_question(question_type)
+    if (question_type == 0)
+      return (question_cepage)
+    elsif (question_type == 1)
+      return (question_sous_region)
+    elsif (question_type == 3)
+      return (question_ville)
+    end
+  end
+
+  def how_many_good_answer()
+    return @@nbr_good_answers
+  end
+end
+
+super_question = Question.new("data.csv")
+@my_nbr=3.0
+(1..@my_nbr).each do |qnbr|
+  super_question.ask_question(rand(super_question.nbr_question_type))
+  sleep(1)
+end
+print "you did #{super_question.how_many_good_answer}%\n"
